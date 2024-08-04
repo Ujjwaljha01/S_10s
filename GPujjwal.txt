@@ -1,0 +1,135 @@
+01 ----  Bullet script-------
+
+using UnityEngine;
+
+public class Bullet : MonoBehaviour
+{
+    public float speed = 10f; // Speed of the bullet
+    public float lifetime = 5f; // Time before the bullet is destroyed
+
+    void Start()
+    {
+        // Destroy the bullet after its lifetime expires
+        Destroy(gameObject, lifetime);
+    }
+
+    void Update()
+    {
+        // Move the bullet forward in its current direction
+        transform.Translate(Vector2.up * speed * Time.deltaTime);
+    }
+
+    void OnTriggerEnter2D(Collider2D other)
+    {
+        if (other.CompareTag("Enemy"))
+        {
+            Destroy(other.gameObject); // Destroy the enemy
+            Destroy(gameObject); // Destroy the bullet
+        }
+    }
+}
+
+
+02 --------Enemy script---------
+
+
+using System.Collections;
+using System.Collections.Generic;
+using UnityEngine;
+
+public class Enemy : MonoBehaviour
+{
+    // Start is called before the first frame update
+    void Start()
+    {
+        
+    }
+
+    // Update is called once per frame
+    void Update()
+    {
+        
+    }
+
+    void OnTriggerEnter2D(Collider2D other)
+    {
+        if (other.CompareTag("Bullet"))
+        {
+            
+            Destroy(other.gameObject); // Destroy the bullet
+        }
+    }
+}
+
+
+03 ------------  GunRotation script---------
+
+
+using UnityEngine;
+
+public class GunRotation : MonoBehaviour
+{
+    public Transform gun; // Reference to the gun's transform
+
+    void Update()
+    {
+        RotateGunTowardsMouse();
+    }
+
+    void RotateGunTowardsMouse()
+    {
+        Vector3 mousePosition = Camera.main.ScreenToWorldPoint(Input.mousePosition);
+        Vector3 direction = (mousePosition - gun.position).normalized;
+        float angle = Mathf.Atan2(direction.y, direction.x) * Mathf.Rad2Deg;
+        gun.rotation = Quaternion.Euler(new Vector3(0, 0, angle));
+    }
+}
+
+
+04 ---------------- GunShoot script----------------
+
+using UnityEngine;
+
+public class GunShoot : MonoBehaviour
+{
+    public GameObject bulletPrefab;
+    public Transform firePoint;
+
+    void Update()
+    {
+        if (Input.GetMouseButtonDown(0))
+        {
+            Shoot();
+        }
+    }
+
+    void Shoot()
+    {
+        GameObject bullet = Instantiate(bulletPrefab, firePoint.position, Quaternion.identity);
+        Vector2 direction = (Camera.main.ScreenToWorldPoint(Input.mousePosition) - firePoint.position).normalized;
+        bullet.GetComponent<Rigidbody2D>().velocity = direction * bullet.GetComponent<Bullet>().speed;
+    }
+}
+
+05 --------------- PlayerMovement ---------------
+
+
+using UnityEngine;
+
+public class PlayerMovement : MonoBehaviour
+{
+    public float moveSpeed = 5f;
+
+    void Update()
+    {
+        float moveX = Input.GetAxis("Horizontal");
+        float moveY = Input.GetAxis("Vertical");
+        Vector2 movement = new Vector2(moveX, moveY) * moveSpeed * Time.deltaTime;
+        transform.Translate(movement);
+    }
+}
+
+
+
+
+
